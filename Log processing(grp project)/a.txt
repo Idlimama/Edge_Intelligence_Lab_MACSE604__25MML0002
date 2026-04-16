@@ -1,1 +1,157 @@
 sgdh
+https://claude.ai/share/001e11c8-c9b8-46d1-bf80-2f965c0e54bc
+https://scikit-learn.org/stable/modules/outlier_detection.html
+
+##############
+
+You are a data engineer tasked with generating realistic synthetic telemetry data for a CubeSat thermal monitoring system operating in space.
+
+Context:
+The satellite orbits Earth and logs temperature, power, environmental, and system activity data. The system must simulate realistic physics-driven behavior including heating from solar exposure and cooling via radiation.
+
+---
+
+Step 1: Define Dataset Requirements
+
+Generate a synthetic dataset with the following properties:
+
+* Format: JSON array (list of records)
+* Number of records: 1000 (or configurable)
+* Time interval: every 1 minute
+* Each record represents one timestamp
+
+---
+
+Step 2: Include Raw Features
+
+Each JSON object must include:
+
+* timestamp (ISO format)
+* processor_temp (°C)
+* battery_temp (°C)
+* solar_panel_temp (°C)
+* cpu_usage (0 to 1)
+* power_consumption (Watts)
+* sun_exposure_flag (0 or 1)
+* orbit_phase ("day" or "night")
+* radiator_orientation_angle (0–180 degrees)
+* subsystem_status:
+  {
+  "ai_model_active": 0/1,
+  "camera_active": 0/1,
+  "radio_active": 0/1
+  }
+
+---
+
+Step 3: Generate Engineered Features
+
+Also include derived features:
+
+* temp_rate_of_change
+* rolling_avg_temp (window = 5)
+* temp_variance (window = 5)
+* thermal_margin (85 - processor_temp)
+* predicted_temp_next_3min
+* time_to_threshold
+* external_heat_load (based on sun_exposure_flag)
+* cpu_sun_interaction = cpu_usage * sun_exposure_flag
+
+---
+
+Step 4: Define Realistic Data Behavior
+
+1. Temperature Logic:
+
+* Base processor_temp range: 40°C to 80°C
+* If sun_exposure_flag = 1 → temperature gradually increases
+* If sun_exposure_flag = 0 → temperature decreases
+* Add noise (±2°C)
+
+2. CPU Usage:
+
+* Random but correlated with AI activity
+* Higher cpu_usage → higher temp
+
+3. Power Consumption:
+
+* Correlated with cpu_usage
+
+4. Battery Temperature:
+
+* Slightly lower than processor_temp
+* Slower variation
+
+5. Solar Panel Temperature:
+
+* High in sunlight (70–120°C)
+* Low in shadow (-50 to 20°C)
+
+---
+
+Step 5: Simulate Anomalies
+
+Include ~5–10% anomaly cases:
+
+* Sudden temperature spikes
+* Rapid rate_of_change
+* Predicted_temp exceeding 85°C
+
+Mark anomalies with:
+
+* is_anomaly (0/1)
+
+---
+
+Step 6: Distribution Requirements
+
+Ensure:
+
+* processor_temp → slightly right-skewed
+* cpu_usage → bimodal (idle vs active)
+* sun_exposure_flag → binary uniform
+* temp_rate_of_change → centered near 0
+
+---
+
+Step 7: Output Format
+
+Return output as:
+
+[
+{
+"timestamp": "2026-04-09T10:00:00Z",
+"processor_temp": 72.5,
+"battery_temp": 65.2,
+"solar_panel_temp": 95.0,
+"cpu_usage": 0.82,
+"power_consumption": 120.5,
+"sun_exposure_flag": 1,
+"orbit_phase": "day",
+"radiator_orientation_angle": 45,
+"subsystem_status": {
+"ai_model_active": 1,
+"camera_active": 1,
+"radio_active": 0
+},
+"temp_rate_of_change": 1.2,
+"rolling_avg_temp": 70.8,
+"temp_variance": 2.5,
+"thermal_margin": 12.5,
+"predicted_temp_next_3min": 78.0,
+"time_to_threshold": 10,
+"external_heat_load": 0.9,
+"cpu_sun_interaction": 0.82,
+"is_anomaly": 0
+}
+]
+
+---
+
+Goal:
+Create a realistic, physics-aware synthetic dataset suitable for:
+
+* Time-series forecasting
+* Anomaly detection
+* Thermal control decision systems
+
